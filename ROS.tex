@@ -1,0 +1,114 @@
+\chapter{Tecnologie e strumenti utilizzati}\label{cap:ROS}
+In questo capitolo verranno esposte le tecnologie utilizzate. Si inizierà da alcuni cenni sulla robotica per poi approfondire il meta-sistema operativo ROS, la sua storia e gli strumenti che esso mette a disposizione.
+\section{Cenni sulla Robotica}
+
+La Robotica è quella branca dell’ingegneria che si occupa della progettazione, dello sviluppo e del funzionamento dei robot, dello studio dei sistemi informatici per l’elaborazione dei dati provenienti dai sensori e del loro utilizzo per delineare il comportamento da tenere al fine di eseguire compiti specifici. Il termine fu coniato nel 1920 dallo scrittore e scienziato ceco Karel Čapek e ha il significato di ``lavoro forzato'' (da \textit{robota}, in ceco) e, in effetti, il fine ultimo di un robot è quello di riprodurre in qualche forma un tipo di lavoro umano.\\ 
+Un robot deve affrontare tutte le difficoltà provenienti dall’interazione col mondo reale: una semplice salita, ad esempio, può modificarne la velocità e la percezione della distanza percorsa, o un leggero urto può condizionarne la traiettoria irrimediabilmente.\\
+Così, pur avendola delineata come branca dell’ingegneria, sono in realtà molteplici le discipline con cui deve confrontarsi: in primis vengono richieste conoscenze dei modelli matematici e della fisica, soprattutto per quanto riguarda la parte di acquisizione ed elaborazione dei dati, essenziale per potersi rapportare con l’ambiente con cui interagisce; successivamente, l’informatica è la disciplina cardine per tutto ciò che riguarda la parte computazionale, e in primo luogo per quello che riguarda il controllo.\\
+Come deve reagire il robot ai dati sensoriali? Nel caso debba eseguire necessariamente più azioni, quale deve essere l’ordine? Sono diverse le architetture di controllo sviluppate al fine di ricreare una sorta di ``intelligenza'' interna al robot, ed evidentemente il campo presenta una complessità non affrontabile dal singolo programmatore.\\
+Nel seguito della tesi verrà esposta una breve descrizione della struttura tipica di un robot e, successivamente, si entrerà nel dettaglio del framework ROS come utile strumento per lo sviluppo software e test di applicazioni robotiche.
+
+\section{Robot}
+
+Un \textit{robot} è una macchina – in particolare, programmabile da un computer – in grado di eseguire una serie di azioni complesse automaticamente~\cite{18}. Con il termine ``robot'', dunque, si vuole indicare un sistema autonomo operante nel mondo fisico, quindi con una sua struttura materiale, che percepisce l’ambiente che lo circonda e che interagisce con esso, attuando procedure al fine di perseguire l’obiettivo per cui è stato creato.\\
+Un robot deve avere, perciò, una struttura fisica con cui interagire col mondo esterno in modo da poterne affrontare le sfide. Un robot che esiste solo all'interno di un computer è solo una simulazione che non affronta la vera complessità del mondo reale. È necessario, quindi, che percepisca l’ambiente in cui si ritrova ad operare e, per fare ciò, deve montare sensori di vario tipo al fine di recuperare informazioni riguardanti il mondo circostante e rispondere nel modo migliore possibile agli ostacoli catturandone la presenza nel proprio percorso. Un robot deve poter agire in risposta agli input derivanti dai sensori, montando quelli che vengono definiti attuatori e affrontare il mondo circostante nelle innumerevoli forme in cui può presentarsi.\\
+Una macchina deve avere tutte le caratteristiche generali sopracitate al fine di essere considerata un robot, ma, per poter esistere, deve presentare quattro elementi fisici che vanno poi a rispecchiarsi nel relativo hardware: un corpo fisico, dei sensori, degli effettori/attuatori e, infine, dei controllori. Essi verranno descritti brevemente di seguito.
+
+\subsection{Corpo} 
+Un robot deve obbligatoriamente essere dotato di un \textit{corpo fisico} per esistere e per poter interagire con il mondo reale. Tuttavia, questo lo porta a dover rispettare tutte le leggi fisiche che esso impone, non potendo disporre di tutti i vantaggi presenti in ambiente di simulazione. Per potersi muovere deve sfruttare i propri attuatori; l'aumento o la diminuzione della sua velocità richiede tempo ed queste azioni possono essere influenzate dalla topologia del mondo circostante. Inoltre, disporre di un corpo implica la probabile eventualità di incorrere in ostacoli e quindi di dover essere coscienti di cosa vi è attorno. Infine, il corpo impone al robot tutta una serie di limitazioni, derivanti dalla forma e struttura del corpo stesso, che vanno a influire sui movimenti, l’interazione con oggetti o altri robot ecc. 
+
+\subsection{Sensori} 
+Si identificano sotto il nome di \textit{sensori} tutti quei dispositivi fisici montati su un robot in grado di ottenere informazioni dall’ambiente circostante e permettere al robot stesso di essere ``cosciente'' di ciò che lo circonda. Il tipo di sensore montato dipende dal tipo di informazione che viene richiesta al fine di poter portare a compimento il proprio task. Si dividono essenzialmente in sensori passivi e attivi.\\ I primi si limitano a strumenti che rilevano la proprietà fisica da misurare, mentre gli ultimi generano un segnale e sfruttano la relativa interazione con l’ambiente circostante come proprietà da misurare. Pertanto, l’uso di entrambi permette al robot di essere a conoscenza del proprio stato, ossia di una descrizione di sé stesso in un certo dato momento, nel qual caso si parla di stato interno, e dell’ambiente circostante in cui deve operare, e qui si parla di stato esterno. 
+
+\subsection{Effettori e Attuatori} 
+Per \textit{effettore} si intende ogni dispositivo fisico che ha un impatto sull’ambiente reale su cui il robot deve operare. Sono essenzialmente la controparte meccanica di quello che in biologia rappresenta una gamba, un braccio, un dito, una mano. Il meccanismo che rende possibile ad un effettore di compiere un’azione viene definito \textit{attuatore}, e tale termine include dispositivi di differenti tipi di tecnologie, come motori elettrici, dispositivi idraulici, pneumatici, materiali foto-reattivi, chimico-reattivi e altri ancora. 
+
+\subsection{Controllori} 
+I \textit{controllori} sono le componenti (hardware e software) che permettono al robot di essere autonomo, processando gli input provenienti dai sensori o altre informazioni come quelle contenute in memoria, decidere quale azione intraprendere e di conseguenza quali effettori mettere in movimento. 
+
+\section{ROS, Robot Operating System}
+
+Nel campo della robotica, le \textit{platform} stanno assumendo un'importanza sempre maggiore. Una piattaforma può essere di tipo software o hardware. Una piattaforma software, in particolare, contiene strumenti utilizzati per creare programmi applicativi per robot come il controllo del dispositivo a basso livello, SLAM (\textit{Simultaneous Localization And Mapping}), navigazione, manipolazione e riconoscimento di oggetti o esseri umani, rilevamento e gestione dei pacchetti, debugging e vari strumenti di sviluppo.\\
+La piattaforma software per robot ad oggi più utilizzata è \textbf{ROS}, \textbf{Robot Operating System}. ROS è un framework open source che consente di gestire operazioni, compiti, movimenti e qualsiasi altra cosa che un robot può eseguire ed è destinato a fungere da piattaforma software non solo per chi costruisce e utilizza robot quotidianamente, ma anche per coloro che approcciano per la prima volta il mondo dello sviluppo di sistemi robotici.\\
+Questa struttura open source della piattaforma consente l'utilizzo del codice e delle informazioni condivise da altri programmatori. Ciò implica che non è necessario scrivere tutto il codice per far funzionare un robot e questo è uno dei motivi principali per cui ROS ha riscosso un notevole successo, diventando una delle soluzioni più utilizzate nel campo dello sviluppo di sistemi robotici.
+
+\subsection{Storia di ROS}
+Possiamo collocare l’inizio dello sviluppo di ROS nel 2007: in quegli anni, due dottorandi dell’università di Stanford, Eric Berger e Keenan Wyrobek, vollero cimentarsi nella creazione di una piattaforma software che permettesse ai loro futuri e presenti colleghi accademici di interfacciarsi al mondo della robotica nella maniera più semplice possibile.\\
+Nei loro primi passi di costruzione di questa piattaforma ``unificatrice'', la prima cosa che fecero fu quella di costruire come prototipo hardware il PR1 dal programma Personal Robotics (PR) e da qui iniziarono a lavorare sul software prendendo spunto dai primi framework robotici open source, in particolare ``\textit{switchyard}'', un sistema a cui Morgan Quigley, un altro dottorando di Stanford, aveva lavorato a sostegno del progetto Stanford AI Robot STAIR (STanford AI Robot) dallo Stanford Artificial Intelligence Laboratory~\cite{19}.\\ Nell’anno successivo, durante la ricerca di finanziamenti per un ulteriore sviluppo~\cite{20}, Eric Berger e Keenan Wyrobek incontrarono Scott Hassan, il fondatore di Willow Garage, un laboratorio di ricerca robotica, che all'epoca stava lavorando ad un SUV autonomo e una barca solare autonoma. Hassan condivise l’idea dei due dottorandi e li invitò a lavorare per Willow Garage. I due accettarono e iniziarono lo sviluppo della piattaforma robot ad oggi più utilizzata, alla quale parteciparono gruppi provenienti da più di venti istituzioni diverse.\\
+La prima versione stabile di ROS, ROS 1.0, venne rilasciata il 22 gennaio del 2010~\cite{21}. Lo sviluppo di ROS da parte di Willow Garage continuò fino al 2013, quando avvenne la transizione verso l’OSRF, l'Open Source Robot Foundation (che dal 2017 si chiama Open Robotics), che divenne il principale manutentore di ROS~\cite{22}.\\ Da allora la popolarità di ROS è cresciuta a dismisura: il 1° settembre 2014, la NASA annunciò il primo robot con framework ROS nello spazio:\textit{ Robotnaut 2}, sulla Stazione Spaziale Internazionale~\cite{23}; anche giganti della tecnologia come Amazon e Microsoft hanno iniziato ad interessarsi a ROS durante questo periodo, con Microsoft che ha portato ROS su Windows nel settembre 2018, seguito da Amazon Web Services che ha rilasciato RoboMaker nel novembre 2018.\\
+Tutta questa popolarità è stata favorita soprattutto dal fatto che ROS venne rilasciato sin dall’inizio sotto licenza BSD (Berkeley Software Distribution) come software gratuito sia per l’ambito di ricerca che per fini commerciali: grazie, dunque, alla natura open source, vi fu un grande contributo da parte della comunità di ricerca mondiale, che permise a ROS di diventare la piattaforma robot più utilizzata al mondo.
+
+\subsection{Il Meta-Sistema Operativo ROS: Caratteristiche e Filosofia}
+ROS è un meta-sistema operativo open source per il robot. Fornisce i servizi che potremmo aspettarci da un classico sistema operativo, inclusa l'astrazione dell'hardware, il controllo del dispositivo di basso livello, l'implementazione di funzionalità più comuni, lo scambio di messaggi tra i processi e la gestione dei pacchetti. Fornisce inoltre strumenti e librerie per ottenere, creare, scrivere ed eseguire codice su più computer, in modo da semplificare il compito di creare un comportamento robotico complesso e robusto su un'ampia varietà di piattaforme robotiche. \\Nonostante il nome, dunque, ROS non è semplicemente un sistema operativo. Piuttosto potremmo definirlo come un SDK (\textit{Software Developement Kit}) che fornisce gli elementi costitutivi necessari per creare applicazioni robot. In un certo senso, ROS può essere visto come l'impianto idraulico alla base dei nodi e del passaggio dei messaggi, che fornisce un insieme ricco e maturo di strumenti e di abilità come mostrato in figura \ref{fig:bytepost}.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=1\textwidth]{images/ros-equation}
+	\caption{Un'immagine raffigurante l'equazione ROS: impianto idraulico + strumenti + capacità + ecosistema = ROS!}
+	\label{fig:bytepost}
+\end{figure}
+
+
+Le caratteristiche principali di ROS sono le seguenti:
+\begin{itemize}
+\item la riutilizzabilità del programma: ciò significa che un utente può focalizzarsi su un obiettivo dell’applicazione che vuole sviluppare e scaricare il pacchetto relativo alle funzionalità rimanenti. Allo stesso tempo, esso può condividere il programma che ha sviluppato, in modo da rendere possibile agli altri di riutilizzarlo;
+\item la modularità: spesso, per offrire un servizio, alcuni programmi hardware sono sviluppati in un singolo frame, ma, per raggiungere la riutilizzabilità dei software robotici, ogni programma viene suddiviso in porzioni minori, in base alla propria funzione;
+\item l'elevato numero di strumenti disponibili per lo sviluppo: ROS offre diversi tool per eseguire debug, strumenti per la visualizzazione 2D (come stage), 3D (come Rviz), o che permettono di visualizzare le relazioni tra nodi (come Rqt). Sono inoltre disponibili in numero sempre più crescente algoritmi robotici che permettono di mappare l’ambiente intorno il robot, rappresentare e interpretare i dati dei sensori, pianificare lo spostamento, manipolare oggetti e molte altre operazioni;
+\item la community attiva: esistono più di 5000 pacchetti sviluppati volontariamente e condivisi tra gli utenti, pagine Wiki che documentano molti aspetti del framework ed un sito Q\&A dove si può chiedere e fornire aiuto, condividendo ciò di cui si è a conoscenza;
+\item l'ecosistema: come detto precedentemente, sono molteplici le piattaforme software sviluppate, ma la più popolare e utilizzata è proprio ROS, anche perché sta creando un ecosistema valido per chiunque, sviluppatori hardware del campo della Robotica, squadre di sviluppo ROS, sviluppatori di applicazioni software e utenti alle prime armi come gli studenti.
+\end{itemize}
+
+Per quanto riguarda gli aspetti filosofici di ROS, invece, possiamo descriverli con le seguenti proprietà:
+\begin{itemize} 
+\item Peer-to-peer: i sistemi ROS consistono in una piccolo numero di programmi interconnessi tra loro che si scambiano messaggi in maniera continua. Questi messaggi vengono inviati direttamente da un programma all’altro, rendendo il sistema più complesso sotto alcuni punti di vista, ma più bilanciato ed efficiente sotto altri, permettendo di avere un numero molto più alto di informazione.
+\item Supporto multi-linguaggio: i moduli ROS possono essere scritti in diversi linguaggi come: C++, Python, LISP, Java, JavaScript, MATLAB, ecc. 
+\item Leggero: le convenzioni utilizzate in ROS fanno in modo che gli utenti creino delle cosiddette librerie ``standalone'', ossia indipendenti dalle altre. Questo strato extra viene proposto per permettere il riutilizzo dei software al di fuori di ROS e semplifica in maniera notevole la creazione dei test autorizzati usando strumenti integrati standard.
+\item Gratis e open source: il core di ROS viene rilasciato sotto i permessi della licenza BSD, che permette un uso sia commerciale che non-commerciale. ROS permette inoltre lo scambio dei dati tra moduli usando l’IPC (Inter Process Communication), il che significa che i processi creati usando ROS possono avere altre licenze per varie componenti.
+\end{itemize}
+
+\section{Strumenti di ROS}
+
+ROS ha molteplici strumenti che possono essere utili quando il robot si muove, oppure quando un algoritmo è in esecuzione, e si vuole capire se il sistema funziona correttamente o meno. Esistono diversi tool ROS, inclusi quelli che gli utenti hanno rilasciato personalmente.\\
+Gli strumenti che verranno descritti e che rappresentano quelli che sono stati maggiormente utilizzati durante gli esperimenti e i test in laboratorio, sono i seguenti: \textit{RViz} (uno strumento di visualizzazione 3D), \textit{Rqt} (ovvero un framework software che implementa strumenti GUI sotto forma di plug-in per visualizzare la correlazione tra nodi e messaggi) e \textit{stageros} (un simulatore 2D).
+
+\subsection{Il visualizzatore 3D RViz}
+\textit{RViz} è lo strumento di visualizzazione 3D di ROS. Lo scopo principale è quello di permettere di visualizzare messaggi e argomenti ROS in 3D, permettendoci di controllare visivamente i dati e i comportamenti del nostro sistema.\\
+C'è la possibilità di visualizzare anche rappresentazioni in diretta dei valori dei sensori relativi ad argomenti ROS inclusi i dati della telecamera, le misurazioni della distanza a infrarossi, i dati del sonar e così via.\\
+RViz ha varie funzioni come l'interazione, il movimento della telecamera, la selezione, il cambio della messa a fuoco della telecamera, la misurazione della distanza, la stima della posizione 2D, il punto di destinazione della navigazione 2D,
+punto di pubblicazione~\cite{25}.\\
+RViz è sicuramente uno degli strumenti più utili di ROS.
+
+\subsection{Lo strumento di sviluppo dell'interfaccia utente grafica Rqt}
+Oltre ad Rviz, che permette la visualizzazione 3D, ROS fornisce anche tool GUI per lo sviluppo di robot, ovvero \textit{Rqt}. \\
+``\textit{Rqt graph}'' è uno strumento che mostra sotto forma di diagramma la correlazione tra nodi attivi e messaggi trasmessi sulla rete ROS. Esso è molto utile per comprendere l'attuale struttura della rete ROS quando il numero di sensori, attuatori e programmi è  molto alto.\\
+``\textit{Rqt plot}'', invece, è uno strumento che fornisce un plug-in GUI che visualizza i valori numerici in un grafico 2D. Lo strumento riceve messaggi ROS e li visualizza attraverso coordinate 2D~\cite{22}.\\ 
+Analizziamo un esempio e studiamo i comandi ``turtlesim\_node'' e ``turtle\_teleop\_key''~\cite{24}.\\
+Il primo comando apre una finestra blu al cui centro c'è una tartaruga. Eseguendo invece il secondo comando in una nuova finestra, vedremo messaggi e istruzioni che danno la possibilità di muovere la tartaruga utilizzando i tasti freccia della tastiera ($ \gets $, $ \to $, $ \uparrow $, $ \downarrow $) o, in un'altra versione, premendo le lettere a, s, w, z. La tartaruga si muoverà secondo il tasto freccia come mostrato nella figura \ref{fig:turtlesim}:
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/turtlesim}
+	\caption{Esempio di esecuzione di ROS Turtle.}
+	\label{fig:turtlesim}
+\end{figure}
+
+L'altra figura \ref{fig:rqtgraphturtlesim} mostra, invece, il grafico generato da Rqt graph, dove i cerchi rappresentano i nodi (/teleop\_turtle, /turtlesim), la scritta /turtle1/cmd\_vel rappresenta il topic e la freccia indica la trasmissione del messaggio.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/rqtgraph_turtlesim}
+	\caption{Esecuzione di Rqt Graph dell'esempio precedente.}
+	\label{fig:rqtgraphturtlesim}
+\end{figure}
+
+
+\subsection{Il simulatore 2D Stage}
+Il nodo \textit{Stageros} permette di utilizzare il simulatore multi-robot Stage 2D, tramite libstage. Stage simula un mondo definito in un file .\textit{world} che contiene tutte le informazioni su di esso: gli ostacoli contenuti, i robot presenti e tutti gli altri oggetti inclusi.\\
+Questo nodo espone solo un sottoinsieme delle funzionalità di Stage. In particolare, trova i modelli Stage di tipo laser, telecamera, posizione e, successivamente, mappa questi modelli ai vari ROS topic. Se almeno un laser/telecamera e un modello di posizione non vengono trovati, stageros non può funzionare~\cite{27}.\\
+Ecco rappresentato nella figura \ref{fig:stageros}, un esempio dell'esecuzione di stage ros con il file \textit{cappero\_laser\_odom\_diag\_obstacle\_2020-05-06-16-26-03.world}, che rappresenta la mappa del DIAG:\\
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\linewidth]{images/Stageros}
+	\caption{Esecuzione di stage.}
+	\label{fig:stageros}
+\end{figure}
+

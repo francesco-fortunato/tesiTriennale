@@ -1,0 +1,24 @@
+\chapter{Conclusioni}
+\label{Conclusioni}
+
+In questa tesi ho voluto proporre una possibile soluzione al problema di anticollisione per robot controllati da remoto. Il sistema proposto permette ad una base mobile su cui è montato uno scanner laser di navigare in un ambiente chiuso e sconosciuto evitando i possibili ostacoli statici e dinamici. Ovviamente, questa soluzione, che si applica solo su sistemi 2D e attrezzati con scanner laser, non copre tutti i possibili campi destinati all’utilizzo, ma può essere implementato per rendere possibile l’applicazione anche in altri casi e sono molti i perfezionamenti possibili: gli sviluppi più sofisticati nell'evitare le collisioni, infatti, vengono raggiunti combinando le informazioni provenienti da più sensori e sistemi.\\
+
+Ad esempio, l’installazione di una telecamera frontale, e quindi l’aggiunta di un’ulteriore assistenza visiva, può essere utilizzata per migliorare l’operabilità.
+Per citare un altro esempio, in quasi tutti i sistemi di navigazione, vi è la possibilità che la base mobile possa muoversi a marcia indietro con una certa velocità. Anche nel sistema presentato è possibile far andare in retromarcia il robot, ma senza prestazioni di sicurezza, ovvero senza che il sistema anticollisione funzioni correttamente. L’aggiunta del sistema anticollisione anche per la situazione della retromarcia può avvenire montando altri laser o aumentando l’ampiezza del laser scanner fino a 360°. Facendo così, viene reso possibile il controllo di tutti gli ostacoli, includendo anche quelli che si trovano dietro la base mobile. \\
+
+Una delle possibili applicazioni del sistema anticollisione proposto, oltre quella dei settori industriali e della cura della salute, è quella del settore automobilistico. Infatti, basti pensare al numero e tipo di incidenti stradali commessi nel 2021, come mostrato nella seguente immagine (figura \ref{fig:das-incidenti-scaled}). 
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\linewidth]{images/DAS-Incidenti-scaled}
+	\caption{Fotografia degli incidenti stradali~\cite{28}.}
+	\label{fig:das-incidenti-scaled}
+\end{figure}
+Come si può vedere, tra le principali cause dei sinistri stradali ci sono: guida distratta o andamento indeciso (23.802 sinistri; il 15,7\% del totale), mancato rispetto della distanza di sicurezza (13.148 sinistri, l’8,7\% del totale), mancata precedenza al pedone (4.838 sinistri, il 3,2\% del totale), ecc. Questi tipi di incidenti potrebbero sicuramente essere evitati se si montasse sulle automobili un sistema di anticollisione, portando ad un enorme risparmio di denaro anche sulla sanità pubblica.\\\\
+
+Si provi, infine, a guardare al traffico e alle collisioni in orbita: un'altra applicazione potrebbe essere proprio quella relativa al settore aerospaziale. Si veda, in particolare, la figura \ref{fig:photo2022-03-08-09}, nella quale viene rappresentata la massa di oggetti in orbita terrestre dal 1958 ad oggi.\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.85\linewidth]{images/photo_2022-03-08-09.38.53}
+	\caption{Evoluzione del numero di satelliti e detriti in orbita terrestre dal 1958 ad oggi. Non è considerato l’incremento di oltre 1000 detriti provocato dal test ASAT russo del 2021~\cite{29}.}
+	\label{fig:photo2022-03-08-09}
+\end{figure}Una collisione in orbita rappresenta un evento disastroso, non solo per il danno economico relativo alla distruzione di un satellite, ma soprattutto per la quantità di detriti che tale impatto può generare, i quali a loro volta diventano potenziali inneschi per altre collisioni, dando origine ad un catastrofico effetto domino che, se non controllato, può portare alla saturazione delle regioni orbitali d’interesse scientifico e commerciale. Il problema è, in realtà, ben noto già da diversi anni con il nome di Sindrome di Kessler e la soluzione potrebbe essere proprio quella dell'installazione di un sistema anticollisione su ogni satellite, in modo da prevenire urti anche nello spazio.\\\\
+In conclusione, il sistema proposto ha davvero svariati campi di applicazione che spaziano dall’ambito automobilistico, a quello sanitario, a quello per la cura della vita, alla risposta di disastri o all’esplorazione di aree pericolose, fino ad arrivare al settore aerospaziale e tale sistema può realmente rendere più semplice e sicura la vita e il lavoro delle persone.

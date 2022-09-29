@@ -1,0 +1,99 @@
+\chapter{Esperimenti e Risultati}
+\label{esperimenti}
+
+In questo capitolo verranno esposti i problemi affrontati e gli esperimenti effettuati con i relativi risultati. Verranno elencati, infine, i limiti del sistema anticollisione proposto.
+
+\section{Esperimenti e problemi affrontati}
+
+Nella seguente sezione verranno mostrati i vari problemi affrontati durante gli esperimenti nell'ambiente di simulazione.
+
+\subsection{Problema dei valori da considerare e del valore delle forze}
+Come spiegato anche nel precedente capitolo, il laser montato sulla base mobile scansiona l’ambiente con un'ampiezza frontale di 270°. Avere una vista più ampia del normale (solitamente, l'angolo massimo che l'occhio umano può vedere ha un’ampiezza di circa 180°) non causa alcun nessun effetto negativo. Al contrario, aumenta il livello di controllo del sistema.\\
+L’algoritmo implementato, permette di rivelare ed evitare nel modo migliore possibile solo ed esclusivamente gli ostacoli che si trovano di fronte alla base mobile ed entro una certa ampiezza, e non anche gli ostacoli laterali (che, di fatto, non ostruiscono il passaggio del robot). Ciò comporta che l’algoritmo deve usare solo il ventaglio dei valori frontali del laser. Per fare ciò, poiché il range dell’array del laser contiene 1081 valori per 270°, si è deciso di optare per una soluzione che considerasse due ulteriori array che rappresentassero i valori centrali e frontali: uno di 321 valori e uno più piccolo di 181 valori. In questo modo è stato possibile rendere la navigazione della base mobile molto più efficiente e fluida nel caso in cui fosse entrata all'interno di spazi molto stretti: in queste circostanze, infatti, il controllo viene fatto su due diversi array, in modo da permettere al robot di entrare nello spazio stretto e, allo stesso tempo, di capire se, una volta entrato, avesse avuto lo spazio per girare su sé stesso.\\
+Come conseguenza, le forze repulsive considerate \textit{non} sono tutte quelle rivelate nell’intorno di 270°, ma \textit{solo} quelle considerate ‘‘frontali’’.
+L’angolo che determina l’ampiezza dei valori centrali considerati è stato scelto, dunque, in modo tale da permettere alla base mobile di passare anche nei tratti molto stretti, ovvero percorsi contenenti ostacoli da entrambi i lati, ma con una distanza tra loro che fosse più grande della larghezza della base mobile, ovvero abbastanza grande da permetterne il passaggio. Uno di questi spazi è quello tra i banchi dell’Aula Magna del DIAG. Dopo vari esperimenti svolti, l’ampiezza ottima è stata scelta pari a 50°.\\
+Nel codice, però, come riportato sopra, viene considerato anche un secondo array con un range di valori relativi ad un'ampiezza maggiore (circa 90°). Quest'ultimo è servito, in particolare, per permettere alla base mobile di diminuire la propria velocità quando questa si avvicinava troppo agli ostacoli, rendendo la navigazione molto più fluida. Nei primi esperimenti, infatti, senza questo decremento, poteva succedere che la velocità fosse talmente alta da non permettere alla base mobile di riuscire a fermarsi, andando a collidere contro gli ostacoli, anche se la situazione era stata analizzata correttamente. In poche parole, considerando solo il primo range di valori, la base mobile sarebbe anche riuscita a reagire positivamente evitando la collisione, ma senza avere abbastanza spazio per modificare la propria traiettoria, fallendo dunque nel tentativo. Il principale motivo della considerazione di questo range più ampio di valori, quindi, è dovuto proprio al necessario decremento della velocità lineare, in modo da far sì che la base mobile avesse il tempo e lo spazio necessario per reagire correttamente. In realtà, grazie a questo secondo array considerato, si è ottenuto non solo un miglioramento nel comportamento della base mobile, ma anche una elusione degli ostacoli e una navigazione molto più fluida (o, come direbbero gli anglo-americani, più \textit{smooth}). Successivamente, si è deciso di confermare e implementare questa scelta, finché dopo vari esperimenti non si è ottenuto l'ottimo valore tra navigazione fluida e soddisfacimento dei requisiti.
+
+Nelle prime fasi dello sviluppo dell’algoritmo, il valore della forza repulsiva causato da un ostacolo \textit{i} veniva calcolato come:
+\begin{equation}
+\label{eqn:1}
+	forza\_repulsiva[i] = k_{1} \cdot distanza\_ostacolo[i].
+\end{equation}
+
+La variabile \textit{distanza\_ostacolo[i]} nell'equazione \ref{eqn:1}, calcolava inizialmente il complemento a 1 della distanza tra l’ostacolo e la base mobile, cioè:
+\begin{equation}
+	distanza\_ostacolo[i] = 1 - laser[i],
+\end{equation}
+ 
+dove con \textit{laser[i]} ci si riferisce al valore della distanza che il laser legge per l’ostacolo \textit{i}. Durante gli esperimenti si è notato, però, che in alcune situazioni il comportamento non era quello previsto. Più precisamente, vi erano casi in cui la base mobile non riusciva ad evitare gli ostacoli che si trovavano davanti ad essa. Questo malfunzionamento era evidente quando dall'altra parte vi erano molti ostacoli che portavano la forza repulsiva totale ad avere una direzione che spingeva la base mobile ad andare verso l'ostacolo meno influente in termini di distanza.\\
+La soluzione a questo problema è stata quella di calcolare il valore della forza repulsiva per ogni ostacolo secondo una \textit{legge esponenziale}. Questo ha portato ad avere sì un valore della forza repulsiva quasi uguale a quello precedente per gli ostacoli più distanti, ma, allo stesso tempo, ha portato anche ad avere un aumento considerevole del valore della forza repulsiva per gli ostacoli più vicini. Dopo molteplici di esperimenti, il grado dell’esponente che è sembrato permettere alla base mobile di avere un comportamento il più adeguato possibile è stato fissato pari a 5.\\
+Perciò, la formula con cui si calcola la forza repulsiva nel codice è stata modificata in
+\begin{equation}
+	forza\_repulsiva[i] = k_{1} \cdot (distanza\_ostacolo[i])^5
+\end{equation}
+La formula per calcolare invece la forza attrattiva è:
+\begin{equation}
+	forza\_attrattiva = k_{2} \cdot velocita\_lineare\_joystick_{x}
+\end{equation}
+
+I coefficienti k$ _{1} $ e k$ _{2} $ sono stati scelti tali per cui la forza repulsiva avesse un valore quanto più simile possibile alla forza attrattiva.
+
+\subsection{Problema della situazione di ``trappola''}
+Un altro problema comparso durante lo sviluppo è stato quello della situazione di ``\textit{trappola}'' per la base mobile. Il nome è stato scelto proprio perché la situazione sembra inizialmente del tutto normale, con il robot che riesce a passare nello spazio stretto, salvo però trovarsi poi in una posizione in cui la collisione risulta inevitabile.\\
+Questa situazione si verifica in particolar modo quando la base mobile entra in percorsi stretti, senza via d'uscita, con ostacoli simmetrici o quasi e in cui risulta impossibile evitare la collisione. Analizzando la forza repulsiva totale generata in questi casi, si è notato che questa aveva verso contrario allo spostamento della base mobile e della velocità lineare. Il suo valore, però, era comunque più piccolo di quello della forza che abbiamo definito attrattiva, non influenzando dunque né la direzione di navigazione della base mobile, né tanto meno l'efficace riduzione della velocità. Quando ci si trovava in questa situazione, la base mobile continuava ad andare verso gli ostacoli frontali, anche se con velocità decrescente, fino, però, ad arrivare al momento della collisione, senza riuscire a fermarsi.\\La soluzione a questo problema è stata quella di considerare tre possibili situazioni in cui la base mobile si sarebbe potuta trovare: una situazione di completa sicurezza, \textbf{SAFE}, una situazione di particolare attenzione, \textbf{WARNING}, e una situazione estrema, \textbf{DANGER}, che poteva risolversi in \textbf{TRAP} se non si fosse trovata alcuna via d'uscita. Quando il robot si trova nello stato SAFE, l’algoritmo non viene azionato. Il robot può eseguire qualsiasi comando ricevuto dall’utente. Nella figura \ref{fig:safe} viene mostrata una situazione in cui la base mobile si trova in uno stato SAFE.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\linewidth]{images/SAFE}
+	\caption{Possibile situazione in cui la base mobile si trova in uno stato SAFE.}
+	\label{fig:safe}
+\end{figure}
+Nel momento in cui la base mobile si avvicina ad un ostacolo, quando si supera una certa distanza da esso, che definiamo \textit{distanza di sicurezza} si entra nella modalità WARNING. In questo caso l’algoritmo entrerà in azione modificando considerevolmente la velocità angolare e lineare del robot, deflettendone la traiettoria. Ecco un esempio, nella figura \ref{fig:warning}, in cui la base mobile si trova in uno stato WARNING.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\linewidth]{images/WARNING}
+	\caption{Possibile situazione di WARNING per la base mobile.}
+	\label{fig:warning}
+\end{figure}
+
+Se, invece, il robot si fosse trovato ad una distanza minore della distanza di sicurezza dall'ostacolo, diciamo \textit{qualche valore in più} della \textit{distanza di pericolo} (ovvero quella che la base mobile deve mantenere dagli ostacoli in modo da potersi arrestare e girare senza che ci siano collisioni), allora questo sarebbe entrato in modalità DANGER. Nella figura \ref{fig:danger} viene riportato un esempio.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\linewidth]{images/DANGER}
+	\caption{Base mobile in modalità DANGER/TRAP.}
+	\label{fig:danger}
+\end{figure}
+
+Anche in questo caso, per evitare la collisione, il comportamento dell’algoritmo cambia. Appena la base mobile entra in questa zona, l’algoritmo cerca di capire da quale lato si trova l’ostacolo più lontano analizzando l’array relativo allo scanner laser. Se si rileva un ostacolo più lontano dagli altri, il robot inizia a girare su sé stesso con una velocità angolare costante e lineare nulla verso la zona con meno ostacoli finché si ritrova di nuovo nella zona di sicurezza (SAFE) o di minor pericolo (WARNING) dove riprende il suo comportamento a seconda del nuovo stato. Nel caso in cui non dovesse trovare una zona libera da ostacoli, la base mobile capisce di trovarsi nella situazione di TRAP. Ecco un esempio nella figura \ref{fig:exit-trap}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\linewidth]{"images/EXIT TRAP"}
+	\caption{Situazione di TRAP dalla quale la base mobile tenta di uscire.}
+	\label{fig:exit-trap}
+\end{figure}
+
+In questa situazione, la base mobile non va né avanti, né indietro, ma gira su sé stessa (di default verso sinistra, ma se si manda il comando di velocità angolare verso destra, il robot cambierà direzione) finché non trova uno spazio libero da ostacoli, uscendo dalla zona di TRAP (figura \ref{fig:after-trap}). \begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{"images/AFTER TRAP"}
+	\caption{La base mobile è uscita dalla situazione di TRAP.}
+	\label{fig:after-trap}
+\end{figure}
+
+
+
+\section{Limiti del Sistema}
+
+Supponendo che l'ostacolo non sia così grande da violare i vincoli cinematici e dinamici del robot e che il sistema sperimentale funzioni correttamente, l'algoritmo di evasione degli ostacoli dovrebbe funzionare in tutti i casi. In questa sezione, verranno discussi i limiti dell’algoritmo per evitare gli ostacoli. 
+
+\subsection{Presenza di ostacoli in movimento}
+Prendiamo come esempio il caso in cui ci sia un ostacolo in movimento.\\
+L'algoritmo è in tempo reale, i movimenti degli ostacoli non sono noti (supponiamo che i limiti di movimento degli ostacoli siano simili a quelli del robot) ed essi possono cambiare velocità durante il movimento.\\
+Con l'algoritmo sviluppato, è possibile che il robot non riesca ad evitare le collisioni se la velocità dell'ostacolo è superiore a quella del robot. Ipotizziamo che la base mobile stia andando verso un determinato punto B, nelle cui vicinanze si trova un ostacolo. Quando il robot arriva al punto B, se l'ostacolo iniziasse ad aumentare la sua velocità verso il robot con una velocità massima maggiore di quella del robot, quest'ultimo non sarebbe in grado di evitare una collisione con l'ostacolo.\\
+Da quanto detto, concludiamo che per evitare il singolo ostacolo, la velocità massima dell'ostacolo deve essere inferiore (o, al massimo, uguale) a quella del robot.
+\subsection{Presenza di ostacoli multipli}
+Un altro caso può essere quello dell’evitare ostacoli multipli. Se la velocità dell'ostacolo è limitata come detto sopra, l'algoritmo sviluppato può effettivamente evitare collisioni con singoli ostacoli. Tuttavia, per più ostacoli, ci sono ancora alcuni casi in cui il robot non può evitare collisioni con l'ostacolo. Un caso è che il robot aumenta la sua velocità angolare per evitare collisioni con un ostacolo. Quando il robot è alla sua velocità massima nella direzione, un secondo ostacolo appare nel raggio di collisione. In questo caso il robot non riesce a fermarsi e ciò si traduce nel fallimento della prevenzione delle collisioni con il secondo ostacolo. \\
+Queste limitazioni sono dovute al fatto che i movimenti degli ostacoli non sono preconosciuti e il movimento del robot non è istantaneo, ma progressivo.
+\subsection{Limiti nel mondo reale}
+Le limitazioni del sistema arrivano anche e soprattutto nel momento in cui usciamo fuori dall’ambiente di simulazione. \\Nel mondo reale, infatti, potrebbero apparire parecchie difficoltà a causa delle forze esterne, ma non solo. \\Pensiamo ad esempio se volessimo abbellire il nostro robot con dell’attrezzatura extra, magari con un gagliardetto, o delle luci ausiliarie. Esse potrebbero ostruire il laser scanner. Oppure, si pensi ad un fondo stradale scivoloso, in cui lo spazio di frenata viene esteso: ridurrebbe la capacità della funzione di evitare una collisione. Essendo il robot multidirezionale, inoltre, potrebbe succedere che un oggetto si posizioni nelle immediate vicinanze del robot, e un eventuale aumento della velocità angolare potrebbe non permettere il soddisfacimento dell’evitamento dell’ostacolo. \\In queste situazioni impegnative la funzione di anticollisione può incontrare difficoltà, ma, poiché il robot è controllato da remoto, l’abilità dell’utente può comunque essere d'aiuto nel prevenire le collisioni.

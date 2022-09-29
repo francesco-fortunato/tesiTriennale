@@ -1,0 +1,40 @@
+\babel@toc {italian}{}\relax 
+\babel@toc {italian}{}\relax 
+\contentsline {chapter}{\numberline {1}Introduzione}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Obiettivi della tesi}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Organizzazione della tesi}{3}{section.1.2}%
+\contentsline {chapter}{\numberline {2}Tecnologie e strumenti utilizzati}{5}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Cenni sulla Robotica}{5}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Robot}{6}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Corpo}{6}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Sensori}{6}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Effettori e Attuatori}{7}{subsection.2.2.3}%
+\contentsline {subsection}{\numberline {2.2.4}Controllori}{7}{subsection.2.2.4}%
+\contentsline {section}{\numberline {2.3}ROS, Robot Operating System}{7}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Storia di ROS}{7}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Il Meta-Sistema Operativo ROS: Caratteristiche e Filosofia}{8}{subsection.2.3.2}%
+\contentsline {section}{\numberline {2.4}Strumenti di ROS}{10}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Il visualizzatore 3D RViz}{10}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Lo strumento di sviluppo dell'interfaccia utente grafica Rqt}{10}{subsection.2.4.2}%
+\contentsline {subsection}{\numberline {2.4.3}Il simulatore 2D Stage}{12}{subsection.2.4.3}%
+\contentsline {chapter}{\numberline {3}Descrizione del Sistema Anticollisione}{13}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Specifiche del progetto}{13}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Struttura del workspace del progetto}{14}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Dettagli di implementazione e terminologia}{14}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Terminologia}{15}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Dettagli di implementazione}{15}{subsection.3.3.2}%
+\contentsline {section}{\numberline {3.4}Approccio utilizzato e algoritmo}{16}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Approccio utilizzato}{16}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Pseudocodice}{19}{subsection.3.4.2}%
+\contentsline {section}{\numberline {3.5}Istruzioni di esecuzione del Sistema}{19}{section.3.5}%
+\contentsline {section}{\numberline {3.6}Strumenti utili per il debug}{21}{section.3.6}%
+\contentsline {chapter}{\numberline {4}Esperimenti e Risultati}{22}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Esperimenti e problemi affrontati}{22}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Problema dei valori da considerare e del valore delle forze}{22}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Problema della situazione di ``trappola''}{24}{subsection.4.1.2}%
+\contentsline {section}{\numberline {4.2}Limiti del Sistema}{27}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Presenza di ostacoli in movimento}{27}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Presenza di ostacoli multipli}{27}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Limiti nel mondo reale}{27}{subsection.4.2.3}%
+\contentsline {chapter}{\numberline {5}Conclusioni}{29}{chapter.5}%
+\contentsline {chapter}{Bibliografia}{32}{section*.18}%

@@ -1,0 +1,183 @@
+\chapter{Descrizione del Sistema Anticollisione}
+\label{descrizione}
+
+Nel seguito della tesi verrà discusso nel dettaglio il sistema anticollisione proposto, l’algoritmo utilizzato, le scelte progettuali e le varie ragioni che hanno portato a queste scelte.
+
+\section{Specifiche del progetto}
+
+Il progetto consiste nell’ideare e sviluppare un sistema anticollisione basato su laser. Senza la presenza di questo, la base mobile prende in input (da un nodo del sistema ROS) una velocità lineare e una angolare con cui la base mobile naviga all’interno del mondo. \\
+Con l’integrazione del sistema anticollisione, oltre alla velocità lineare e quella angolare, viene ricevuto in input anche un array di valori che rappresentano la distanza degli ostacoli che il laser scanner rivela. Il sistema, poi, produce un comando di velocità che, utilizzando lo scanner, previene la collisione con gli oggetti rivelati nel contorno, “deflettendo” la traiettoria del robot verso uno spazio libero da collisioni.\\
+La navigazione, come detto precedentemente, è stata simulata grazie al file .world fornitoci dal professore e all’utilizzo di \textit{stage}.\\
+Continuando con le specifiche del progetto, il sistema ideato doveva, dunque, garantire che la base mobile riuscisse a navigare in un particolare ambiente di simulazione non solo senza collidere con i possibili ostacoli che potevano presentarsi, ma anche modificando la traiettoria in maniera intelligente, scegliendo la strada ``\textit{migliore}'', cioè quella più sgombra da ostacoli, senza interrompere la navigazione. \\
+Gli ostacoli presenti possono essere di due tipi: statici, come un muro, i banchi delle aule, o dinamici come altri oggetti in movimento.\\
+Il sistema realizzato possiede un’ulteriore implementazione rispetto alle specifiche richieste dal progetto, ovvero la possibilità di controllare da remoto la base mobile attraverso un joystick, migliorando di gran lunga l'operabilità, senza, dunque, l’obbligo di dover inserire manualmente da terminale i valori della velocità da inviare in input al robot. \\
+
+\section{Struttura del workspace del progetto}
+
+Lo sviluppo del progetto si basa su pacchetti forniti dal professore durante il corso. Tutte le informazioni vengono fornite all'interno di un repository GitLab (vedere la sezione 3.5). Il progetto consiste, all'atto pratico, nella creazione e nello sviluppo di un package ROS all’interno del proprio catkin workspace, che ha una struttura di questo tipo:\\
+\begin{tabbing}
+	catkin\_ws/ \quad \quad       -- WORKSPACE\\
+	\quad src/ \quad \quad \quad \quad \quad \quad                -- SOURCE SPACE\\
+	\quad \quad CMakeLists.txt \quad  \quad   -- `Toplevel' CMake file, provided by catkin\\
+	\quad \quad collision\_avoidance/\\
+	\quad \quad \quad CMakeLists.txt \quad \quad    -- CMakeLists.txt file for package collision\_avoidance\\
+	\quad \quad \quad package.xml \quad \quad \quad \space -- Package manifest for package collision\_avoidance\\
+	\quad \quad \quad src/\\
+	\quad \quad \quad \quad collision\_avoidance.cpp \quad \quad 	-- collision\_avoidance.cpp file (node) 
+\end{tabbing}
+
+Nel package creato sono state incluse le seguenti dipendenze ROS, necessarie per la compilazione dei vari file: \textit{geometry\_msgs}, \textit{nav\_msgs}, \textit{sensor\_msgs}, \textit{std\_msgs} e \textit{roscpp}. \\
+Un package ROS, per essere considerato tale, deve contenere almeno i seguenti elementi:
+\begin{itemize}
+	\item Un file \textit{CMakeLists.txt}, che sarà l’input per il sistema di compilazione CMake e per la creazione di pacchetti software. Ogni package compilato con CMake deve contenere uno o più file CmakeLists.txt che descrivono come compilare il codice e dove installarlo. In esso sono definite molte informazioni come la versione del CMake, il nome del package, le dipendenze, vari generatori di messaggi, servizi, azioni e altro.
+	\item Un file chiamato \textit{package.xml} che deve essere presente nella root di ogni pacchetto compilato con catkin e in cui vengono definite tutte le meta-informazioni del pacchetto quali il nome, la versione, gli autori, i manutentori e le dipendenze sugli altri catkin package.
+	\item Una directory \textit{/src} nella quale è possibile dichiarare nodi, messaggi, servizi e azioni create dall’utente. Di norma, i file dello stesso tipo vengono raggruppati in cartelle diverse per motivi di organizzazione del lavoro. Nel progetto sviluppato, non era necessario creare altri file tranne che un file nodo (in questo caso il file collision\_avoidance.cpp) e, perciò, dentro la cartella /src si trova solo questo file.
+\end{itemize}
+
+\section{Dettagli di implementazione e terminologia}
+
+Il file \textit{collision\_avoidance.cpp}, che, di fatto, è un cosiddetto ``nodo'' (di cui se ne parlerà in questa sezione) nel sistema ROS ed è il file nel quale è stato implementato il sistema anticollisione, è stato scritto utilizzando come linguaggio di programmazione il linguaggio C++. La scelta è stata strettamente personale: lo stesso sistema, infatti, sarebbe stato scrivibile utilizzando anche altri linguaggi di programmazione. \\
+
+\subsection{Terminologia}
+Verranno date ora definizioni e terminologie usate in questo progetto:\\
+\begin{itemize}
+	\item Un \textit{nodo} è definito come un file eseguibile che sfrutta ROS per comunicare con altri nodi.
+	\item Un \textit{messaggio} è un tipo di dato ROS che viene trasmesso tra più nodi.
+	\item Un \textit{topic} è un canale di comunicazione che permette ai vari nodi di scambiarsi dati oppure messaggi. Un topic può essere usato per mandare/ricevere messaggi di un solo tipo ed è attivo solo quando c’è almeno un nodo che pubblica messaggi e almeno uno che li riceve. 
+	\item Un nodo che pubblica messaggi su un topic viene definito \textit{publisher}, mentre un nodo che si sottoscrive ad un topic viene definito \textit{subscriber}. Un nodo può essere contemporaneamente sia di tipo publisher che di tipo subscriber.
+\end{itemize}
+
+\subsection{Dettagli di implementazione}
+Il nodo \textit{collision\_avoidance.cpp} comunica con altri nodi, ed ha il ruolo sia di publisher che di subscriber.\\
+I due nodi del sistema ROS con cui il nodo /collision\_avoidance comunica sono:
+
+\begin{itemize}
+	\item /stageros: un eseguibile fornito durante il corso, che lancia il simulatore 2D Stage con una base mobile presente in una mappa descritta da un file di input. Questo nodo pubblica anche su due topic a cui il nodo /collision\_avoidance è sottoscritto. Questi due topic sono:
+	\begin{itemize}
+		\item /base\_scan: un topic che permette lo scambio di messaggi del tipo sensor\_msgs/LaserScan. Questi messaggi contengono informazioni ricevute da un laser planare che fornisce informazioni utili per la navigazione della base mobile. Tra tutte le informazioni che si trovano in questo messaggio, la più importante è quella relativa al vettore che contiene la distanza tra un ostacolo e la base mobile per ogni lettura del laser. Si noti che il laser scansiona l’ambiente con un angolo pari a 270°.
+		\item /odom: un altro topic che permette lo scambio di messaggi del tipo nav\_msgs/Odometry. Questi messaggi contengono informazioni riguardanti la posizione e velocità nello spazio della base mobile. La posizione deve essere calcolata secondo le coordinate di un  frame header presente nel messaggio, mentre la velocità secondo quelle del frame child. Il nodo /collision\_avoidance ricava da questo messaggio la posizione della base mobile e il suo orientamento in modo da poter calcolare le direzioni delle forze che agiscono sulla base mobile e, successivamente, capire la direzione finale che essa deve prendere in presenza degli ostacoli.
+	\end{itemize}
+	
+	\item /joy\_control: un altro eseguibile, anch'esso fornito durante il corso, che legge comandi usando un telecomando da gioco (joystick) e li converte in comandi di velocità lineare e angolare. Questi comandi di velocità sono proprio quelli che il nodo /collision\_avoidance riceve in input. La trasmissione di questi messaggi (che sono di tipo nav\_msgs/Odometry) avviene attraverso il topic /vel\_joystick.
+\end{itemize}
+
+Nella figura \ref{fig:rqtcollisionavoidance} viene mostrata la relazione tra i nodi e i topic presenti nel sistema ROS proposto.\\
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\linewidth]{images/rqt_collision_avoidance}
+	\caption{Rappresentazione Rqt Graph del sistema anticollisione.}
+	\label{fig:rqtcollisionavoidance}
+\end{figure}
+
+
+Lo strumento che consente di visualizzare questa relazione è Rqt Graph, lo strumento fornito da ROS che è stato descritto nel capitolo precedente.
+
+\section{Approccio utilizzato e algoritmo}
+Come detto poc'anzi, il compito di questo sistema era quello di rivelare nell’intorno della base mobile tutti i possibili ostacoli che si trovassero nelle vicinanze e reagire di conseguenza nel miglior modo possibile per evitarli.\\
+Nel seguito della relazione verrà esposto l'approccio utilizzato e uno pseudocodice relativo all'algoritmo presente nel nodo /collision\_avoidance.cpp.
+
+\subsection{Approccio utilizzato}
+L’approccio utilizzato in questo progetto è stato quello di associare ad ogni ostacolo rivelato dallo scanner una \textit{forza repulsiva} in base alla distanza dell’ostacolo dal robot.\\
+Anche la velocità ricevuta in input può essere vista come una forza: per distinguerla da quella repulsiva generata dagli ostacoli, chiameremo la forza generata dalla velocità ricevuta \textit{forza attrattiva}.\\
+La forza repulsiva deve essere abbastanza grande da riuscire a sovrastare quella attrattiva nel caso ci siano ostacoli troppo vicini, permettendo così il raggiungimento dell'obiettivo richiesto, ovvero quello di evitare gli ostacoli. \\Considerando la direzione del percorso minimo dalla base mobile all’ostacolo, la forza repulsiva dovrà avere stessa direzione, ma verso opposto.\\
+Notiamo che la forza repulsiva è, in realtà, una \textit{somma} di tante forze repulsive quanti sono gli ostacoli che la base mobile incontra durante la navigazione. Perciò, quando si parla di forza repulsiva della base mobile, si parla della somma di tutte le componenti delle forze repulsive associate ad ogni ostacolo.\\
+Nella figura \ref{fig:psx20220831121010} seguente vengono mostrate in forma grafica tutte le forze in gioco in una possibile situazione in cui si riceve in input una certa velocità lineare positiva, una velocità angolare nulla, e agisce sulla base mobile una forza repulsiva generata dall’ostacolo \textit{OBSTACLE} situato ad una certa distanza \textit{r}, con le relative componenti \textit{x} e \textit{z} della forza.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{images/PSX_20220831_121010.jpg}
+	\caption{Forze in gioco presenti durante la navigazione del robot.}
+	\label{fig:psx20220831121010}
+\end{figure}
+
+La forza repulsiva dovrà avere un valore maggiore quanto più l’ostacolo si trova vicino alla base mobile e minore quanto più l’ostacolo è lontano. Come si evince anche dall'immagine, il valore delle componenti della forza cambia se l’ostacolo si trova a sinistra, a destra o di fronte alla base mobile. \\
+La forza attrattiva, d’altra parte, ha sempre la stessa direzione e verso della velocità lineare con cui naviga la base mobile. Si noti che quando la base mobile riceve in input anche una velocità angolare, questa forza comunque ha stesso verso della velocità lineare. L’effetto della velocità angolare è semplicemente quello di modificare l'orientamento della base mobile.\\
+Il valore della forza attrattiva viene calcolato moltiplicando la velocità lineare ricevuta in input per una costante, ed essa ha valore maggiore quanto più la velocità ricevuta è alta, mentre ha valore minore quanto più la velocità ricevuta è bassa.\\
+Nella figura \ref{fig:psx20220831121010}, viene mostrata anche le componente della forza attrattiva secondo gli assi di orientamento (in questo caso l'unica componente è quella indicata con vel-joystick-linear$ _{x} $). Inoltre, poiché la direzione della base mobile coincide con l’asse delle ordinate, allora la componente secondo l’asse delle ascisse sarà sempre nulla.\\
+L’algoritmo utilizzato calcola dunque tutte queste forze per ogni istante della navigazione, ne calcola le componenti secondo gli assi \textit{x} e \textit{z} e fa la somma di \textit{tutte} le componenti. \\
+\textit{La forza risultante è}, dunque, \textit{pari alla somma della forza attrattiva e di tutte le forze repulsive che vengono generate dalla presenza degli ostacoli in quell’istante}.\\ 
+La componente \textit{x} della forza risultante indica il valore della velocità lineare con cui la base mobile deve navigare in reazione alla presenza degli ostacoli, mentre la componente \textit{z} indica il valore della nuova velocità angolare da applicare al robot.\\
+Ecco rappresentate nella figura \ref{fig:img20220831122252744} le componenti delle forze risultanti dell'esempio precedente.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{images/IMG_20220831_122252_744.png}
+	\caption{Forze risultanti dell'esempio precedente.}
+	\label{fig:img20220831122252744}
+\end{figure}
+
+È importante notare, inoltre, che quando il verso della forza risultante è opposto a quello dell'orientamento della base mobile (per opposto si intende che i due vettori formano un'angolo maggiore di 90°), ci dev'essere una velocità angolare che permetta alla base mobile di roteare verso la giusta direzione. Questa velocità si sovrappone alla possibile velocità angolare che viene inviata in input alla base mobile.\\ 
+Si noti che il valore della velocità angolare creata dalla forza risultante, è maggiore quanto più l’angolo tra le due direzioni è ampio, mentre risulta essere minore quanto più l’angolo è stretto. Questo valore della velocità angolare, che all'interno del codice viene definito come \textit{vel\_imposta}, determina di fatto quanto velocemente reagisce il sistema alla presenza degli ostacoli.\\
+Altro aspetto importante da notare è che l’algoritmo descritto si ``aziona'' \textit{solo} nel momento in cui si riceve in input una velocità lineare strettamente positiva. Se la velocità lineare ricevuta è pari a 0, allora il robot rimarrà fermo, mentre nel caso in cui si riceva una velocità lineare negativa, il robot andrà in retromarcia senza modificare la sua traiettoria. Questo perché il laser installato sul robot copre una visuale pari a 270°. \\\\\\
+
+\subsection{Pseudocodice}
+
+In questo paragrafo viene mostrato uno pseudocodice che mostra il funzionamento del programma:
+\begin{tabbing}
+	MAIN\\ 
+	\quad \quad Legge il valore della velocità ricevuto in input dal joystick\\
+	\quad \quad Inizializza a zero tutte le forze: attrattiva, repulsiva e risultante\\
+	\quad \quad Genera un array che considera solo i valori centrali letti dal laser\\
+	\quad \quad WHILE true\\
+	\quad \quad \quad \quad IF velocità lineare positiva\\
+	\quad \quad \quad \quad \quad \quad Calcola l’orientamento in radianti della base mobile \\
+	\quad \quad \quad \quad \quad \quad FOR ogni valore della distanza dagli ostacoli abbastanza piccolo\\
+	\quad \quad \quad \quad \quad \quad nell'array dei valori centrali dello scanner\\
+	\quad \quad \quad \quad \quad \quad \quad \quad Calcola le componenti della forza repulsiva generate\\ \quad \quad \quad \quad \quad \quad \quad \quad dall’ostacolo\\
+	\quad \quad \quad \quad \quad \quad \quad \quad Somma questi valori alla forza repulsiva totale \\
+	\quad \quad \quad \quad \quad \quad END FOR\\
+	\quad \quad \quad \quad \quad \quad Calcola la forza attrattiva data dalla velocità lineare in input\\
+	\quad \quad \quad \quad \quad \quad Calcola la forza risultante come somma tra forza attrattiva e\\
+	\quad \quad \quad \quad \quad \quad repulsiva\\
+	\quad \quad \quad \quad \quad \quad Calcola il giusto orientamento della base mobile\\
+	\quad \quad \quad \quad \quad \quad Assegna quindi la velocità angolare da trasmettere\\
+	\quad \quad \quad \quad \quad \quad Diminuisci la velocità lineare se vicino agli ostacoli\\
+	\quad \quad \quad \quad \quad \quad Esegui il publish della velocità\\ 
+	\quad \quad \quad \quad END IF\\
+	\quad \quad END WHILE\\
+	END MAIN
+\end{tabbing}
+
+
+
+\section{Istruzioni di esecuzione del Sistema}
+
+Nel seguito verranno date tutte le indicazioni per poter installare e testare il sistema anticollisione.\\ 
+Per l'esecuzione o il test del sistema è innanzitutto richiesta l’installazione del meta-sistema operativo ROS, seguendo le istruzioni sulla pagina ufficiale all’indirizzo:  \textit{http://wiki.ros.org/melodic/Installation}. \\
+Per questo progetto è stata utilizzata la distribuzione ROS Melodic. Il funzionamento è garantito se si utilizza questa versione e il sistema operativo Ubuntu 18.04.\\
+Inoltre, durante il corso, è stato fornito agli studenti del corso \textit{Laboratorio di Intelligenza Artificiale e Grafica Interattiva} un repository GitLab contenente uno script shell che installerà da sé tutti i pacchetti e i nodi necessari al corretto funzionamento del sistema anticollisione.\\
+Più precisamente, verranno installati i package forniti dal professore che permetteranno di leggere comandi di velocità ricevuti da un joystick e di convertirli in messaggi di tipo nav\_msgs/Odometry. Sono presenti inoltre i file che permettono di installare e avviare il simulatore 2D Stage e il file .world che descrive il mondo nel quale si vuole far navigare la base mobile.\\
+La documentazione per la configurazione del workspace e l’installazione di tutti i file viene fornita sul repository GitLab del professor Grisetti Giorgio, presente all’indirizzo \textit{https://gitlab.com/grisetti/labiagi\_2020\_21}.\\
+Come specificato precedentemente, il progetto è stato sviluppato per il sistema operativo Ubuntu 18.04 e tutti i comandi per l’esecuzione vengono eseguiti da shell Linux, mentre il codice del sistema anticollisione e le relative istruzioni per l’installazione si trovano nel repository pubblico presente all’indirizzo \textit{https://github.com/francesco-fortunato/Collision\_Avoidance}.\\
+Una volta installato ROS ed eseguite le procedure di installazione per questi due repo, è possibile avviare il sistema anticollisione.\\
+Per prima cosa, come per ogni sistema che utilizza ROS, bisogna avviare la raccolta dei nodi e dei programmi necessari per far funzionare il sistema, ovvero \textit{roscore}.\\
+Su terminale basta eseguire il comando
+roscore.\\
+Il secondo passo è quello di collocarsi all’interno della cartella fornita durante il corso. In particolare, poiché va utilizzato il file eseguibile che legge comandi inviati dal joystick, bisogna modificare il topic sul quale questo nodo pubblica i messaggi di velocità. Per fare ciò, basterà aprire con un qualsiasi editor il file chiamato joy\_teleop\_node.cpp  che si trova nella directory workspaces/srrg2\_labiagi/src/srrg\_joystick\_teleop/src. Il nome del topic andrà modificato in /vel\_joystick, lo stesso nome al quale il nodo /collision\_avoidance, rappresentante il nodo principale del sistema anticollisione, deve sottoscriversi per poter leggere la velocità ricevuta in input.\\
+A questo punto ci si ricolloca nuovamente nella root del repo e si compila il workspace. La compilazione deve avvenire almeno una volta dopo la prima configurazione del workspace e ogni volta che un suo file viene modificato. Basterà eseguire il file \textit{setup.sh}.
+Successivamente, si esegue il comando \textit{catkin build} nella cartella in cui è stato clonato il repo Collision\_Avoidance.\\
+Su un altro tab del terminale Linux viene eseguito il comando per lanciare il nodo /joy\_control attraverso l'istruzione rosrun srrg\_joystick\_teleop joy\_teleop\_node.\\
+Il comando, come si può vedere, viene composto dalla keyword \textit{rosrun}, fondamentale per lanciare nodi nel sistema ROS, il package dove il file eseguibile si trova e il nome dell’eseguibile.\\
+Per lanciare il nodo del simulatore Stage, ci si posiziona dentro la cartella che si trova nella directory workspaces/srrg2\_labiagi/src/srrg2\_navigation\_2d/config.\\
+In questa cartella si trovano diversi file, tra cui i file .world che descrive il mondo in cui si vuol far navigare il robot.
+Per lanciare il simulatore, dunque, si esegue il comando rosrun stage\_ros stageros <file.world> su un nuovo tab del terminale.\\
+Il comando è composto dalla parola chiave \textit{rosrun}, che, come detto prima, è necessario per lanciare i nodi ROS, il nome del package dove il file del simulatore si trova (ovvero stage\_ros), il nome dell'eseguibile e il nome del file che descrive il mondo.\\
+Come detto precedentemente, il sistema anticollisione è stato pensato per navigare all’interno del mondo ‘cappero\_laser\_odom\_diag\_obstacle\_2020-05-06-16-26-03.world’, ma nulla vieta di testarlo anche in altri mondi.\\
+Come ultima cosa, si avvia il nodo collision\_avoidance. Per lanciare il nodo, ci si sposta nella directory del workspace Collision\_Avoidance. Si compila poi il workspace sempre con il comando ‘catkin\_build’ (ricordiamo che tale istruzione deve essere eseguita ogni qualvolta si effettui una modifica, per rigenerare i file eseguibili corretti). Successivamente ci si colloca nella directory in cui si trova il file C++ che descrive il sistema, seguendo il percorso src/collision\_avoidance/src.\\
+Il comando per lanciare il nodo è il seguente: rosrun collision\_avoidance collision\_avoidance.\\
+Dopo aver eseguito queste istruzioni, sarà possibile testare il funzionamento del sistema, controllare la base mobile attraverso il proprio joystick e vedere come vengono evitate le collisioni.\\
+
+\section{Strumenti utili per il debug}
+In questa sezione sono illustrati i principali tool per eseguire il debug:
+\begin{itemize}
+	\item il primo comando, già citato nella tesi, è \textit{Rqt\_Graph}, che è possibile eseguire lanciando da terminale la seguente istruzione:\\
+	rosrun rqt\_graph rqt\_graph;
+	\item un altro comando utile è il seguente:\\
+	rostopic pub [-r] [frequenza(Hz)] <nome\_topic> <tipo\_messaggio>\\
+	che permette la pubblicazione su un determinato topic del sistema, specificandolo in <nome\_topic>, messaggi del tipo <tipo\_messaggio>, specificando se deve essere inviato un solo messaggio oppure più messaggi con una certa frequenza;
+	\item infine, se l'utente volesse mettersi in ascolto su un certo topic, in modo da visualizzarne i messaggi, è possibile utilizzare il comando:\\
+	rostopic echo <nome\_topic> [-nNUM]\\
+	dove si specifica il nome del topic in <nome\_topic> e il numero degli ultimi messaggi che si vogliono leggere in [-nNUM].
+\end{itemize}
+
+

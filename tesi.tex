@@ -1,0 +1,194 @@
+\documentclass[noexaminfo,oneside,binding=0.6cm]{sapthesis}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{lipsum}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{placeins}
+\usepackage{listings}
+\usepackage{array}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{multicol,caption}
+\usepackage{microtype}
+\usepackage[bottom]{footmisc}
+\hypersetup{pdftitle={Progetto e sviluppo di un sistema anticollisione per sistemi di navigazione robotici           remote-controlled},pdfauthor={Francesco Fortunato}}
+
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	numbers=left,                    
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\graphicspath{ {images/} }
+\hypersetup{
+	colorlinks,
+	citecolor=black,
+	filecolor=black,
+	linkcolor=black,
+	urlcolor=black
+}
+
+	
+\advisor{Thomas Alessandro Ciarfuglia}
+\course{Corso di Laurea in Ingegneria Informatica e Automatica}
+\courseorganizer{Facoltà di Ingegneria dell’Informazione, Informatica e Statistica\\[1mm]Dipartimento di Ingegneria Informatica, Automatica e Gestionale “Antonio Ruberti”}
+\IDnumber{1848527}
+\submitdate{2021/2022}
+\copyyear{2022}
+\authoremail{francesco.fortunato1999@gmail.com}
+\author{Francesco Fortunato}
+
+\thesistype{Tesi di Laurea Triennale}
+\title{Progetto e sviluppo di un sistema anticollisione per sistemi di navigazione robotici controllati da remoto}
+
+
+\begin{document}
+	
+	\frontmatter
+	\pagenumbering{Roman}
+	\setcounter{page}{1}
+	\maketitle
+	\pagenumbering{Roman}
+	\setcounter{page}{2}
+	\dedication{Alla mia famiglia} 
+	\pagenumbering{Roman}
+	\setcounter{page}{3}
+	\begin{abstract}
+		\pagestyle{empty}
+		\thispagestyle{empty}
+		Il documento che segue è la relazione finale del progetto del \textit{Laboratorio di Intelligenza Artificiale e Grafica Interattiva} basato sulla realizzazione di un sistema anticollisione per sistemi di navigazione robotici. Il seguente testo è frutto dello studio e del lavoro di molteplici settimane che mi ha permesso di acquisire varie conoscenze sul campo della robotica, in particolar modo dal punto di vista software. \\
+		
+		Il sistema anticollisione per sistemi di navigazione robotici controllati da remoto si compone di una base mobile, un monitor, e un dispositivo di controllo. Tale sistema si basa, in particolare, sull'utilizzo della \textit{forza assistita} generata dagli ostacoli posti nelle immediate vicinanze del robot. Questa forza viene applicata mentre l'utente utilizza un dispositivo di controllo per telecomandare il robot, permettendo così di evitare le collisioni, migliorando di molto le prestazioni di sicurezza.\\
+		
+		Questa tesi rappresenta per me il coronamento tanto atteso della mia carriera universitaria triennale, e sarò legato a questo momento per tutto il resto della vita.
+	\end{abstract}
+	\begin{acknowledgments}\pagestyle{empty}\thispagestyle{empty}Prima di procedere con la trattazione, vorrei dedicare qualche riga a tutti coloro che mi sono stati vicini in questo percorso di studi.\\\\
+	Vorrei ringraziare innanzitutto i miei genitori, che mi hanno permesso di arrivare a questo traguardo, per avermi sempre sostenuto senza mai darmi pressioni di alcun tipo e per essermi stati sempre accanto. Le parole non possono esprimere quanto sono grato a mia madre e mio padre per tutti i sacrifici che hanno fatto per me. Senza di loro non sarei qui, oggi, a scrivere questa tesi.\\\\
+	Ringrazio tutti i professori del mio corso di studi, che hanno fatto nascere grandi passioni in me.\\\\
+	Ringrazio tutti i miei amici e colleghi, con cui ho condiviso gioie e dolori dell'università, in particolare ai miei compagni di studi, di svago e di sofferenze Ernest, Giacomo e Gabriele.\\\\
+	Ringrazio la mia fidanzata Alessandra, per essere stata sempre al mio fianco, per il supporto che non è mai mancato, per tutti i momenti passati e per aver sempre riempito le nostre giornate di amore e spensieratezza.\\\\
+	Infine, un grazie anche me stesso e alla mia forza di volontà: ho fatto anch'io i miei sacrifici, ho sudato sui libri per anni, ed è soprattutto grazie a tutto ciò se sono arrivato fin qui.\\\\
+	Grazie.
+	\end{acknowledgments}
+	
+	\pagenumbering{Roman}
+	\setcounter{page}{5}
+	\tableofcontents
+	
+	
+	\mainmatter
+	\pagenumbering{arabic}
+	\setcounter{page}{1}
+	
+	\include{intro}
+	\include{ROS}
+	\include{descrizione}
+	\include{esperimenti}
+	\include{conclusioni}
+	
+	\backmatter
+	\cleardoublepage
+	\phantomsection 
+	\addcontentsline{toc}{chapter}{\bibname}
+	\begin{thebibliography}{bibl}
+		\bibitem{1}
+		Yi J.-B., Kang T., Song D., Yi S.-J,
+		\emph{Unified Software Platform for Intelligent Home Service Robots}, Appl. Sc., 2020.
+		\bibitem{2}
+		Joon A., Kowalczyk W.,
+		\emph{W. Design of Autonomous Mobile Robot for Cleaning in the Environment with Obstacles,} 2021. 
+		\bibitem{3}
+		Ruan K., Wu Z., Xu Q., \emph{Smart Cleaner: A New Autonomous Indoor Disinfection Robot for Combating the COVID-19 Pandemic}, 2021,  mdpi.com/2218-6581/10/3/87.
+		\bibitem{4}
+		Viacheslav Pshikhopov, \emph{Path Planning for Vehicles Operating in Uncertain 2D Environments}, Butterworth-Heinemann, 2017.
+		\bibitem{5}
+		Biagiotti L., Melchiorri C., \emph{Trajectory Planning for Automatic Machines and Robots}, Spring, 2008.
+		\bibitem{6}
+		Zivkovic, Z., Kröse, B, \emph{People Detection Using Multiple Sensors on a Mobile Robot}, Spring, 2008.
+		\bibitem{7}
+		Vijayalakshmi M.,
+		\emph{ICT for Competitive Strategies}, CRC Press, 2020, pp.81-90.
+		\bibitem{8}
+		Sayers C.,
+		\emph{Remote Control Robotics}, Spring, 1999.
+		\bibitem{9}
+		Cook G.,
+		\emph{Mobile Robots: Navigation, Control and Remote Sensing}, Wiley-IEEE Press, 2011.
+		\bibitem{10}
+		Bing Z., Kaige W.,
+		\emph{A New Remote Health-Care System Based on Moving Robot Intended for the Elderly at Home}, Denise Ferebee, 2017.
+		\bibitem{11}
+		Junqiang Z., Ziyang M., Jia M.,
+		\emph{A Remote-Controlled Robotic System with Safety Protection Strategy Based on Force-Sensing and Bending Feedback for Transcatheter Arterial Chemoembolization}, 2020, https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7569875/.
+		\bibitem{12}
+		Farabee K., Itmamul Haque A.,
+		\emph{Night Patrolling Robot}, 2021, 2nd International Conference on Robotics, Electrical and Signal Processing Techniques (ICREST) https://ieeexplore.ieee.org/document/9331198.
+		\bibitem{13}
+		Shashank G., Pierre L.,  Keshav C., Jeremi G., Mario Nunez J.,
+		\emph{Command and Control Systems for Search and Rescue Robots}, IntechOpen, 2017. 
+		\bibitem{14}
+		Sadia S., Saiful Islam S.; Kazi Ragib Ishraq S.,
+		\emph{A Low-Cost Urban Search and Rescue Robot for Developing Countries}, 2019, 2019 IEEE International Conference on Robotics, Automation, Artificial-intelligence and Internet-of-Things (RAAICON) https://ieeexplore.ieee.org/document/9087495.
+		\bibitem{15}
+		R. Masaki and N. Motoi, 	\emph{Remote Control Method With Force Assist Based on Time to Collision for Mobile Robot}, in IEEE Open Journal of the Industrial Electronics Society, vol. 1, pp. 157-165, 2020, doi: 10.1109/OJIES.2020.3013249.
+		\bibitem{16}
+		R. Masaki and N. Motoi, 	\emph{Remote Control Method With Force Assist Based on Time to Collision for Mobile Robot}, in IEEE Open Journal of the Industrial Electronics Society, vol. 1, pp. 157-165, 2020, doi: 10.1109/OJIES.2020.3013249.
+		\bibitem{17}
+		Khurshid RP, Fitter NT, Fedalei EA, Kuchenbecker KJ, \emph{Effects of Grip-Force, Contact, and Acceleration Feedback on a Teleoperated Pick-and-Place Task}, IEEE Trans Haptics. 2017 Jan-Mar;10(1):40-53. doi: 10.1109/TOH.2016.2573301. Epub 2016 May 26. PMID: 27249838.
+		\bibitem{18}
+		Definition of 'robot', \emph{Oxford English Dictionary}.
+		\bibitem{19}
+		Ng Andrew, Gould
+		Stephen, Quigley Morgan, Berger, Eric. \emph{STAIR: The
+		STanford Artificial Intelligence Robot project}, Snowbird Workshop, 2008.
+		\bibitem{20}
+		Keenan Wyrobek,
+		\emph{Personal Robotics Program Fund Fundraising Deck from 2006}, 2017.
+		\bibitem{21}
+		\emph{ROS 1.0 – ROS robotics news}, Open Robotics. Retrieved 29 April 2019. ROS.org
+		\bibitem{22}
+		\emph{Osrf – Ros @ Osrf}, 11 February 2013. Retrieved 12 July 2014, Osrfoundation.org
+		\bibitem{23}
+		\emph{ROS running on ISS – ROS robotics news}, Open Robotics. Retrieved 12 December 2017, ROS.org
+		\bibitem{24}
+		Sito Ufficiale ROS, ROS.org
+		\bibitem{25}
+		RViz Official Documentation, 	http://wiki.ros.org/rviz
+		\bibitem{26}
+		Rqt Official Documentation, 	http://wiki.ros.org/rqt
+		\bibitem{27}
+		Stage Ros Official Documentation, 	http://wiki.ros.org/stage
+		\bibitem{28}	
+		Sicurauto, sicurauto.it/news
+		\bibitem{29}
+		\emph{Orbital Debris, Quarterly news}, National Aeronautics and Space Administration, vol. 23, Issue 1 \& 2, May 2019.
+		
+	\end{thebibliography}
+	
+\end{document}
